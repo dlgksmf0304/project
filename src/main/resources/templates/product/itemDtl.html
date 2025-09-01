@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<meta charset="UTF-8">
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div class="card-body">
+    <div layout:fragment="content">
+
+        <input type="hidden" id="itemId" th:value="${item.id}">
+        <input type="hidden" id="price" th:value="${item.price}">
+
+        <div class="d-flex">
+            <div class="repImgDiv">
+                <img src="/images/item/main1.jpg" class="rounded repImg" th:alt="${item.itemNm}">
+            </div>
+
+            <div class="wd50">
+                <span th:if="${item.itemSellStatus.name() == 'SELL'}" class="badge badge-primary mgb-15">
+                    판매중
+                </span>
+                <span th:unless="${item.itemSellStatus.name() == 'SELL'}" class="badge btn-danger mgb-15">
+                    품절
+                </span>
+
+                <div class="h4" th:text="${item.itemNm}"></div>
+                <hr class="my-4">
+
+                <div class="text-right">
+                    <div class="h4 text-danger text-left">
+                        <span th:text="${item.price}"></span>원
+                    </div>
+
+                    <div class="my-3">
+                        <span>👁️ 조회수: <span th:text="${item.views}">0</span></span>
+                        <span class="ms-3">❤️ 좋아요: <span id="like-count" th:text="${item.likes}">0</span></span>
+                    </div>
+
+                    <button type="button" class="btn btn-danger" th:onclick="addLike([[${item.id}]])">
+                        ❤️ 좋아요
+                    </button>
+
+                    <div class="input-group w-50">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">수량</span>
+                        </div>
+                        <input type="number" id="count" class="form-control" value="1" min="1">
+                    </div>
+                </div>
+                <hr class="my-4">
+
+                <div class="text-right mgt-50">
+                    <h5>결제 금액</h5>
+                    <h3 id="totalPrice" class="font-weight-bold"></h3>
+                </div>
+
+                <div th:if="${item.itemSellStatus.name() == 'SELL'}" class="text-right">
+                    <button type="button" class="btn btn-light border border-primary btn-lg" onclick="addToCart()">장바구니 담기</button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="order()">주문하기</button>
+                </div>
+                <div th:unless="${item.itemSellStatus.name() == 'SELL'}" class="text-right">
+                    <button type="button" class="btn btn-danger btn-lg">품절</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="jumbotron jumbotron-fluid mgt-30">
+            <div class="container">
+                <h4 class="display-5">상품 상세 설명</h4>
+                <hr class="my-4">
+                <p class="lead" th:text="${item.itemDetail}"></p>
+            </div>
+        </div>
+
+        <div th:each="itemImg : ${item.itemImgDtoList}" class="text-center">
+            <img th:if="${not #strings.isEmpty(itemImg.imgUrl)}"
+                 th:src="@{/images/item/{file}(file=${itemImg.imgUrl})}"
+                 class="rounded mgb-15" width="800">
+        </div>
+
+    </div>
+</div>
+
+<div layout:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script th:inline="javascript">
+        // HTML 문서가 준비되면 실행되는 함수입니다.
+        $(document).ready(function(){
+            // 페이지 로딩 시 총 결제 금액을 한 번 계산하여 표시합니다.
+            calculateTotalPrice();
+
+            // 수량 입력창의 값이 변경될 때마다 총 결제 금액을 다시 계산합니다.
+            $("#count").on('input change', function(){
+                calculateTotalPrice();
+            });
+        });
+
+        // 수량과 가격을 곱하여 총 결제 금액을 계산하고 HTML에 업데이트합니다.
+        function calculateTotalPrice(){
+            var count = parseInt($("#count").val()) || 1; // '수량' 입력값
+            var price = parseInt($("#price").val()) || 0; // '가격' 입력값
+
+            if(count < 1) { // 수량이 1보다 작으면 1로 강제 설정합니다.
+                count = 1;
+                $("#count").val(1);
+            }
+
+            var totalPrice = price * count; // 총 가격 계산
+            $("#totalPrice").html(totalPrice.toLocaleString() + '원'); // 쉼표를 넣어 보기 좋게 표시
+        }
+
+        // 장바구니에 상품을 추가하는 함수입니다. - 장바구니 담기
+        function addToCart() {
+            var paramData = {
+                itemId : $("#itemId").val(), // 상품 ID
+                count : $("#count").val() // 상품 수량
+            };
+
+            // Ajax를 사용해 서버의 '/cart' URL로 POST 요청을 보냅니다.
+            $.ajax({
+                url      : "/cart",
+                type     : "POST",
+                contentType : "application/json",
+                data     : JSON.stringify(paramData), // 데이터를 JSON 형식으로 변환하여 전송
+                dataType : "json",
+                success  : function(result){ // 요청 성공 시
+                    // confirm을 사용하여 사용자에게 선택권을 제공
+                    if(confirm("장바구니에 상품이 담겼습니다. 장바구니로 이동하시겠습니까?")) {
+                        location.href = "/cart"; // '예' 선택 시 장바구니 페이지로 이동
+                    }
+                    // '아니오' 선택 시 아무것도 하지 않음 (현재 페이지에 머물러 있음)
+                },
+                error : function(jqXHR){ // 요청 실패 시
+                    if(jqXHR.status == '401'){
+                        alert('로그인 후 이용해주세요'); // 401 Unauthorized 에러 시 로그인 유도
+                        location.href='/member/login';
+                    } else{
+                        alert(jqXHR.responseText); // 그 외 에러 메시지 표시
+                    }
+                }
+            });
+        }
+
+        // 바로 주문을 진행하는 함수입니다. - 주문하기
+        function order(){
+            var paramData = {
+                itemId : $("#itemId").val(), // 상품 ID
+                count : $("#count").val() // 상품 수량
+            };
+
+            // Ajax를 사용해 서버의 '/order' URL로 POST 요청을 보냅니다.
+            $.ajax({
+                url      : "/cart",
+                type     : "POST",
+                contentType : "application/json",
+                data     : JSON.stringify(paramData), // 데이터를 JSON 형식으로 변환하여 전송
+                dataType : "json",
+                success  : function(result){ // 요청 성공 시
+                    location.href='/cart'; // 메인 페이지로 이동
+                },
+                error : function(jqXHR){ // 요청 실패 시
+                    if(jqXHR.status == '401'){
+                        alert('로그인 후 이용해주세요'); // 401 Unauthorized 에러 시 로그인 유도
+                        location.href='/member/login';
+                    } else{
+                        alert(jqXHR.responseText); // 그 외 에러 메시지 표시
+                    }
+                }
+            });
+        }
+
+        // '좋아요' 버튼을 클릭했을 때 실행되는 함수입니다.
+        function addLike(itemId) {
+            const url = "/item/" + itemId + "/like"; // 좋아요 API URL
+
+            // fetch API를 사용해 서버로 POST 요청을 보냅니다.
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    // CSRF 토큰 설정은 필요에 따라 추가
+                }
+            }).then(response => {
+                if (response.ok) { // 응답이 성공적일 경우
+                    const likeCountElement = document.getElementById('like-count');
+                    let currentLikes = parseInt(likeCountElement.innerText);
+                    likeCountElement.innerText = currentLikes + 1; // 화면의 좋아요 수를 1 증가
+                    alert('이 상품을 좋아합니다.');
+                } else { // 응답 실패 시
+                    alert('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
+                }
+            }).catch(error => { // 네트워크 오류 등 예외 발생 시
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

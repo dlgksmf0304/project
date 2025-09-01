@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<meta charset="UTF-8">
+
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+
+<body>
+<div class="card-body">
+    <div layout:fragment="content">
+
+    <form id="registerForm" action="/member/modify" method="post">
+        <div class="input-group mb-3">
+            <span class="input-group-text">ID</span>
+            <input type="text" name="mid" class="form-control"
+                   th:value="${#authentication.principal.mid}" readonly>
+        </div><br>
+        <div class="input-group mb-3">
+            <span class="input-group-text">PW</span>
+            <input type="password" class="form-control" id="mpassword" name="mpassword" placeholder="비밀번호">
+        </div><br>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">PWCHECK</span>
+            <input type="password" class="form-control" id="mpasswordcheck" name="mpasswordcheck" placeholder="비밀번호 확인">
+        </div><br>
+        <div id="pwMessage" style="color:red; font-size:0.9em; margin-bottom:10px;"></div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">NAME</span>
+            <input type="text" name="mname" class="form-control"
+                   th:value="${#authentication.principal.mname}">
+        </div><br>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">PHONENUMBER</span>
+            <input type="text" name="mphoneNumber" class="form-control"
+                   th:value="${#authentication.principal.mphoneNumber}">
+        </div><br>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">EMAIL</span>
+            <input type="email" name="memail" class="form-control"
+                   th:value="${#authentication.principal.memail}" readonly>
+        </div><br>
+
+        <div>
+            <input type="text" id="mpostcode" name="mpostcode" class="form-control"
+                th:value="${(#authentication.principal.mpostcode != null and #authentication.principal.mpostcode != '') ? #authentication.principal.mpostcode : '우편번호'}">
+            <input type="text" id="maddress" name="maddress" class="form-control"
+                th:value="${(#authentication.principal.maddress != null and #authentication.principal.maddress != '') ? #authentication.principal.maddress : '주소'}">
+            <input type="text" id="mdetailAddress" name="mdetailAddress" class="form-control"
+                th:value="${(#authentication.principal.mdetailAddress != null and #authentication.principal.mdetailAddress != '') ? #authentication.principal.mdetailAddress : '상세 주소'}">
+            <button type="button" id="addrBtn" class="btn-submit">주소 검색</button>
+        </div><br>
+
+        <div>
+            <input type="file" id="profileInput" data-type="profile">
+                <button type="button" class="uploadBtn"
+                    data-type="profile"
+                    th:attr="data-user-id=${#authentication.principal.mid}">
+                업로드
+                </button>
+        </div><br>
+
+        <div class="my-4">
+            <div class="float-end">
+                <button type="submit" class="btn-submit">Submit</button>
+                <button type="reset" class="btn-submit">Reset</button>
+
+
+            </div>
+        </div>
+    </form>
+</div><!--end card body-->
+
+
+
+    <th:block layout:fragment="script">
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="/js/addAddressDetails.js"></script>
+
+        <script type="module" th:src="@{/js/uploadImages.js}"></script>
+        <script src="/js/passwordCheck.js"></script>
+    </th:block>
+
+</body>
+</html>

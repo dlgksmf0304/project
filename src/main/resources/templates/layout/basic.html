@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Re:Life</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div class="main-body">
+    <div class="header-container">
+        <header class="header">
+            <div class="logo">
+                <a href="/" class="menu-item">
+                    <img src="/images/benner.png" alt="Re:Life Logo">
+                </a>
+            </div>
+
+            <div class="menu-bar">
+
+                <a href="/" class="menu-item">HOME</a>
+
+                <div class="menu-item" onclick="toggleDropdown(this)">
+                    NOTICE
+                    <div class="dropdown">
+                        <a href="/board/list">공지사항</a>
+                        <a href="/board/userList">문의사항</a>
+                        <a href="#">이벤트</a>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown(this)">
+                    SHOP
+                    <div class="dropdown">
+                        <a href="/admin/item/new">아이템폼</a>
+                        <a href="/admin/items">아이템델타</a>
+                        <a href="/products">상품 목록</a>
+                        <a href="#">생활용품</a>
+                        <a href="#">패션 잡화</a>
+                        <a href="#">홈 케어</a>
+                        <a href="#">펫 라이프</a>
+                        <a href="#">웰빙</a>
+                    </div>
+                </div>
+
+                <!-- CART 메뉴 (수정됨) -->
+                <div class="menu-item">
+                    <a href="/cart" class="menu-item">CART</a>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown(this)">
+                    MYPAGE
+                    <div class="dropdown">
+                        <a href="/member/userMyPage">나의 정보</a>
+                        <a href="/cartList">카트리스트</a>
+                        <a th:href="@{/cart/order/history}">오더히스트</a>
+                    </div>
+                </div>
+
+                <div class="user-actions">
+                    <div class="search-container">
+                        <input type="text" placeholder="검색" aria-label="Search">
+                        <button class="Search-button">Search</button>
+                        <button class="login-button" th:if="${#authorization.expression('isAnonymous()')}" onclick="location.href='/member/login'">Login</button>
+                        <button class="login-button" th:if="${#authorization.expression('isAuthenticated()')}" onclick="location.href='/member/logout'" type="submit">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <!-- 페이지별 컨텐츠 삽입 -->
+    <main class="content-placeholder" layout:fragment="content">
+        <p>기본 컨텐츠</p>
+    </main>
+
+</div>
+
+<footer>
+    <div th:replace="fragments/footer :: footer"></div>
+</footer>
+
+<!-- 공용 JS -->
+<script>
+    function toggleDropdown(menuItem) {
+        document.querySelectorAll('.menu-item').forEach(item => {
+            if (item !== menuItem) {
+                item.classList.remove('active');
+            }
+        });
+        menuItem.classList.toggle('active');
+    }
+
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.menu-item')) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+    });
+</script>
+
+<!-- 페이지별 JS 삽입용 fragment -->
+<th:block layout:fragment="script"></th:block>
+
+</body>
+</html>

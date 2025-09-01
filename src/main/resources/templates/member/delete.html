@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<meta charset="UTF-8">
+
+
+<head>
+        <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+
+
+<body>
+<div class="card-body">
+<div layout:fragment="content">
+
+<form id="deleteAccountForm" th:action="@{/member/delete}" method="post">
+
+    <div class="message">
+    <p>계정을 삭제하면 모든 데이터가 사라집니다. 정말 삭제하시겠습니까?</p>
+        <div>
+        <br>
+        <br>
+
+     <form class="delete-form">
+    <input type="password" name="checkPassword" class="form-control" placeholder="비밀번호 확인" required />
+    <button type="submit" class="btn btn-del">계정 삭제</button>
+    </form>
+</form>
+
+</div>
+
+
+
+
+
+<!-- 실패 메시지 alert -->
+<div th:if="${message}">
+    <script th:inline="javascript">
+        alert([[${message}]]);
+    </script>
+</div>
+</body>
+</html>

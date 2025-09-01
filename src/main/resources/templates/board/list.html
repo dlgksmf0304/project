@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="a-body">
+        <div class="row mt-3">
+            <div class="col">
+
+                <div class="card">
+                    <div class="card-header">
+                        공지사항
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">번호</th>
+                            <th scope="col">제목</th>
+                            <th scope="col">작성자</th>
+                            <th scope="col">작성일</th>
+   <!--                         <th scope="col">좋아요</th>-->
+                            <th scope="col">조회 수</th>
+                        </tr>
+                        </thead>
+
+                        <tbody th:with="link = ${pageAdminRequestDTO.getLink()}"
+                                 th:each="dto : ${responseDTO.dtoList}">
+                        <tr class="table-body">
+                            <td th:text="${dto.bno}"></td>
+                            <td>
+                                <a th:href="@{/board/read(bno=${dto.bno})}" style="text-decoration: none; color: inherit;">
+                                    <span th:if="${dto.notice}" style="color:#009879; font-weight:bold">[공지]</span>
+                                    <span th:text="${dto.title}"></span>
+                                </a>
+                            </td>
+                            <td th:text="${dto.writer}"></td>
+                            <td>[[${#temporals.format(dto.regDate, 'yyyy-MM-dd')}]]</td>
+
+<!--
+                            <td>
+                                <button type="button" class="like-btn" data-bno="[[${dto.bno}]]">
+                                    <span class="heart" th:text="${dto.liked} ? '❤️' : '♡'"></span>
+                                    <span class="like-count" th:text="${dto.likeCount}">0</span>
+                                </button>
+
+                            </td>
+-->
+
+                            <td th:text="${dto.viewCount}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="float-end">
+                        <ul class="pagination flex-wrap">
+
+                            <!-- 이전 버튼 -->
+                            <li class="page-item" th:classappend="${!responseDTO.prev} ? 'disabled' : ''">
+                                <a href="javascript:void(0)" class="page-link"
+                                   th:onclick="'movePage(' + (${responseDTO.page > 1 ? responseDTO.page - 1 : 1}) + ')'">이전</a>
+                            </li>
+
+                            <!-- 페이지 번호들 -->
+                            <th:block th:each="i : ${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                                <li th:class="${responseDTO.page == i} ? 'page-item active' : 'page-item'">
+                                    <a href="javascript:void(0)" class="page-link" th:onclick="'movePage(' + ${i} + ')'" th:text="${i}"></a>
+                                </li>
+                            </th:block>
+
+                            <!-- 다음 버튼 - 수정된 부분! -->
+                            <li class="page-item" th:classappend="${!responseDTO.next} ? 'disabled': ''">
+                                <a href="javascript:void(0)" class="page-link"
+                                   th:onclick="'movePage(' + (${responseDTO.page < responseDTO.end ? responseDTO.page + 1 : responseDTO.end}) + ')'">다음</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <a href="/board/register">
+                        <button type="button" class="btn-write">글쓰기</button> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script layout:fragment="script" th:inline="javascript">
+    console.log("스크립트 로딩...");
+
+    // 페이지 이동 함수
+    function movePage(pageNum) {
+        console.log("페이지 이동:", pageNum);
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', pageNum);
+        window.location.href = window.location.pathname + '?' + urlParams.toString();
+    }
+
+    // 페이지 로딩 시 로그
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("현재 페이지:", /*[[${responseDTO.page}]]*/);
+        console.log("전체 페이지:", /*[[${responseDTO.end}]]*/);
+    });
+
+    // 좋아요 토글 함수
+    function toggleLike(button) {
+        const bno = button.getAttribute('data-bno');
+        const heartIcon = button.querySelector('.heart-icon');
+        const countSpan = button.querySelector('.like-count');
+
+        fetch('/board/like/${bno}' + bno, {method: 'POST'})
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    countSpan.textContent = data.likeCount;
+                    heartIcon.textContent = data.liked ? '♥' : '♡';
+                }
+            })
+            .catch(err => console.error(err));
+    }
+</script>
+</html>

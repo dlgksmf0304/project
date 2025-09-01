@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+        <link rel="stylesheet" href="/css/style.css">
+</head>
+
+
+<body>
+<div layout:fragment="content">
+<div class="board-container">
+    <div class="board-header">게시판</div>
+
+    <form th:action="@{/board/register}" method="post" th:object="${dto}">
+        <div class="board-item">
+            <div class="board-label">제목</div>
+            <!-- <div th:if="${#authentication.principal?.role == 'ADMIN'}">-->
+            <label><input type="checkbox" th:field="*{notice}"> 공지글</label>
+
+            <div class="board-value">
+                <input type="text" th:field="*{title}" class="clean-input" placeholder="제목을 세 글자 이상 입력하세요" />
+            </div>
+        </div>
+
+
+
+        <div class="board-item">
+            <div class="board-label">내용</div>
+            <div class="board-value board-content">
+                <textarea th:field="*{content}" class="clean-input" rows="5" placeholder="내용을 입력하세요"></textarea>
+            </div>
+        </div>
+
+        <!-- <div class="board-item" th:if="${user.role eq 'ADMIN'}">-->
+        <div class="board-item">
+            <div class="board-label">작성자</div>
+              <div th:field="*{content}" class="clean-input" rows="5" readonly>리라이프</div>
+            </div>
+
+        <!-- 업로드 단계에서 받아온 tempKey를 hidden input에 저장 -->
+        <!--tempKey는 게시물 업로드 전 bno = null임을 대체할 임시 uuid-->
+        <input type="hidden" id="tempKey" name="tempKey" value="">
+
+        <!-- <input type="file" name="image">
+         <button type="submit" class="btn btn-submit">사진 등록</button>-->
+        <!--게시글 등록전 dto.bno는 항상 null이므로  data-board-id="temp" 하드 코딩-->
+        <input type="file" id="boardInput" multiple data-type="board">
+        <button type="button" class="uploadBtn"
+                data-type="board"
+                data-board-id="temp">
+            게시판 사진 등록
+        </button>
+
+        <!-- 미리보기 영역 -->
+        <div id="preview">
+
+        </div>
+
+        <div class="float-end">
+            <button type="submit" class="btn btn-submit">작성하기</button>
+        </div>
+    </form>
+
+
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <script type="module" th:src="@{/js/uploadImages.js}"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content" class="card-body">
+
+    <div>
+        <!-- 프로필 이미지가 있으면 출력 -->
+        <img th:if="${#authentication.principal.profileImagePath != null}"
+             th:src="${#authentication.principal.profileImagePath}"
+             alt="프로필 이미지" width="100" height="100">
+
+        <!-- 없으면 기본 이미지 -->
+        <img th:if="${#authentication.principal.profileImagePath == null}"
+             src="/images/default_profile.png"
+             alt="기본 프로필 이미지" width="100" height="100">
+
+        <a href="/member/modify" class="text-success">회원정보 수정</a>
+        <a href="/member/delete" class="text-success">회원 삭제</a>
+    </div>
+
+</div>
+</body>
+</html>

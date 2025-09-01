@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+
+  <div class="container mb-3">
+    <form th:action="@{/products}" method="get" class="form-inline">
+      <input type="hidden" name="searchQuery" th:value="${itemSearchDto?.searchQuery}">
+
+      <select name="sortBy" class="form-control" onchange="this.form.submit()">
+        <option value="">최신순</option>
+        <option value="priceAsc" th:selected="${itemSearchDto?.sortBy == 'priceAsc'}">낮은 가격순</option>
+        <option value="priceDesc" th:selected="${itemSearchDto?.sortBy == 'priceDesc'}">높은 가격순</option>
+        <option value="likesDesc" th:selected="${itemSearchDto?.sortBy == 'likesDesc'}">좋아요 많은순</option>
+        <option value="viewsDesc" th:selected="${itemSearchDto?.sortBy == 'viewsDesc'}">조회수 높은순</option>
+        <option value="viewsAsc" th:selected="${itemSearchDto?.sortBy == 'viewsAsc'}">조회수 낮은순</option>
+      </select>
+    </form>
+  </div>
+
+  <input type="hidden" name="searchQuery" th:value="${itemSearchDto?.searchQuery ?: ''}">
+  <div th:if="${itemSearchDto?.searchQuery != null and not #strings.isEmpty(itemSearchDto.searchQuery)}" class="center">
+    <p class="h3 font-weight-bold" th:text="${itemSearchDto.searchQuery} + ' 검색 결과'"></p>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <th:block th:each="item, status : ${items.getContent()}">
+        <div class="col-md-4 margin mb-4">
+          <div class="card h-100">
+            <a th:href="'/item/' + ${item.id}" class="text-dark text-decoration-none">
+              <img th:src="${item.imgUrl}" class="card-img-top" th:alt="${item.itemNm}" height="400" style="object-fit: cover;">
+              <div class="card-body">
+                <h4 class="card-title">[[${item.itemNm}]]</h4>
+                <p class="card-text">[[${item.itemDetail}]]</p>
+                <h3 class="card-title text-danger">[[${item.price}]]원</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+      </th:block>
+    </div>
+  </div>
+
+  <div th:with="start=${(items.number/maxPage)*maxPage + 1},
+                end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)}),
+                searchQuery=${itemSearchDto?.searchQuery ?: ''},
+                sortBy=${itemSearchDto?.sortBy ?: ''}" >
+
+    <ul class="pagination justify-content-center">
+
+      <li class="page-item" th:classappend="${items.first} ? 'disabled' : ''">
+        <a th:href="@{/products(searchQuery=${searchQuery}, sortBy=${sortBy}, page=${items.number - 1})}"
+           aria-label='Previous' class="page-link">
+          <span aria-hidden='true'>Previous</span>
+        </a>
+      </li>
+
+      <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}"
+          th:classappend="${items.number eq page-1} ? 'active' : ''">
+        <a th:href="@{/products(searchQuery=${searchQuery}, sortBy=${sortBy}, page=${page - 1})}"
+           th:inline="text" class="page-link">[[${page}]]</a>
+      </li>
+
+      <li class="page-item" th:classappend="${items.last} ? 'disabled' : ''">
+        <a th:href="@{/products(searchQuery=${searchQuery}, sortBy=${sortBy}, page=${items.number + 1})}"
+           aria-label='Next' class="page-link">
+          <span aria-hidden='true'>Next</span>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

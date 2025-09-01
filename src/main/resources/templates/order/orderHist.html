@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 내역</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>주문 내역</h2>
+
+  <!-- 주문 내역이 있을 때 -->
+  <div th:if="${orders != null and !#lists.isEmpty(orders)}">
+    <div th:each="order : ${orders}" class="card mb-3" th:attr="data-order-id=${order.orderId}">
+      <div class="card-header">
+        <strong>주문 ID:</strong> <span th:text="${order.orderId}"></span>
+        &nbsp; | &nbsp;
+        <strong>회원 ID:</strong> <span th:text="${order.memberId}"></span>
+        &nbsp; | &nbsp;
+        <strong>주문 상태:</strong> <span class="order-status" th:text="${order.status}"></span>
+        &nbsp; | &nbsp;
+        <strong>총 결제 금액:</strong> <span th:text="${orderTotalMap[order.orderId]}"></span> 원
+        &nbsp; | &nbsp;
+        <strong>주문일:</strong> <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></span>
+
+        <!-- 주문 취소 버튼 (Ajax 처리) -->
+        <button th:if="${order.status != 'CANCEL'}" class="btn btn-danger btn-sm cancel-btn">주문 취소</button>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li th:each="item : ${order.orderItems}" class="list-group-item">
+          <span><strong>상품명:</strong> <span th:text="${item.itemNm}"></span></span>
+          &nbsp; | &nbsp;
+          <span><strong>수량:</strong> <span th:text="${item.count}"></span></span>
+          &nbsp; | &nbsp;
+          <span><strong>가격:</strong> <span th:text="${item.orderPrice}"></span> 원</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 주문 내역이 없을 때 -->
+  <div th:if="${orders == null or #lists.isEmpty(orders)}">
+    <p>주문 내역이 없습니다.</p>
+  </div>
+
+  <!-- 페이징 (5개씩) -->
+  <nav aria-label="Page navigation example" th:if="${totalPages > 1}">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${page == 1} ? 'disabled'">
+        <a class="page-link" th:href="@{/cart/order/history(page=${page-1})}">이전</a>
+      </li>
+      <li class="page-item" th:each="i : ${#numbers.sequence((page-1)/5*5+1, T(java.lang.Math).min(totalPages, (page-1)/5*5+5))}"
+          th:classappend="${i == page} ? 'active'">
+        <a class="page-link" th:href="@{/cart/order/history(page=${i})}" th:text="${i}"></a>
+      </li>
+      <li class="page-item" th:classappend="${page == totalPages} ? 'disabled'">
+        <a class="page-link" th:href="@{/cart/order/history(page=${page+1})}">다음</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 메인 화면 이동 버튼 (항상 표시) -->
+  <div class="text-center mt-4">
+    <a th:href="@{/}" class="btn btn-outline-secondary btn-lg">메인화면</a>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.cancel-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const card = button.closest('.card');
+        const orderId = card.getAttribute('data-order-id');
+
+        if (!confirm('정말 주문을 취소하시겠습니까?')) return;
+
+        fetch('/cart/order/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ orderId: orderId }),
+          credentials: 'same-origin' // ✅ 세션 유지
+        })
+                .then(res => res.text())
+                .then(result => {
+                  if(result === 'success') {
+                    // 상태 표시 업데이트
+                    card.querySelector('.order-status').textContent = 'CANCEL';
+                    // 버튼 제거
+                    button.remove();
+                  } else {
+                    alert('주문 취소 실패: ' + result);
+                  }
+                })
+                .catch(err => {
+                  console.error(err);
+                  alert('주문 취소 중 오류가 발생했습니다.');
+                });
+      });
+    });
+  });
+</script>
+</body>
+</html>

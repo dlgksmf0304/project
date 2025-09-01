@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+        <link rel="stylesheet" href="/css/style.css">
+</head>
+
+
+<body>
+
+<div layout:fragment="content">
+<!-- 메인 처음 이미지 상자 -->
+<div class="hero">
+    <div class="mug-container">
+        <div class="mug"></div>
+        <div class="sof-circle">SOF</div>
+        <br><br>
+        <div class="buy-box">
+            <strong>ROUND EDGE MUG CUP</strong><br>
+            20,000 WON<br>
+            A COLORFUL MUG WITH A PROMINENT IMAGE OF A ROUND SHAPE<br>
+            <button>BUY NOW</button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- 사진 설명 -->
+    <div class="container">
+        <div class="left">
+            <img src="/images/main1.jpg" alt="main1 Image">
+        </div>
+        Zero waste is not just a lifestyle; it’s a bold commitment to rethink consumption, transform waste into resources, and leave the planet cleaner than we found it
+        <div class="right">
+            <img src="/images/main2.jpg" alt="main2 Image">
+            <div class="text">
+                Every piece of plastic we discard drifts into the oceans, threatening marine life and ecosystems, reminding us that our convenience today can become the ocean’s catastrophe tomorrow
+                <div class="left">
+                    <img src="/images/main3.jpg" alt="main3 Image">
+                </div>
+                SOF IS AN ONLINE STORE FOR STATIONERY AND SUNDRIES BOASTING A VINTAGE AMBIANCE. OFFERING PRODUCTS CATERING TO ALL TASTES, SOF INVITES YOU TO GIFT THIS SPECIAL ITEM TO SOMEONE DEAR
+            </div>
+        </div>
+    </div>
+
+
+<!-- 베스트 상품 그런 거 -->
+<div class="section FFD94D-bg">
+    <h2>RE:LIFE CHOICE</h2>
+    <div class="slider-container">
+        <div class="product-row" id="productRow">
+            <div class="product">
+                <img src="product1.png" data-hover="product1_hover.png" alt="상품1">
+                <div class="product-name">VINTAGE MOOD POST CARD SET</div>
+                <div class="product-price">3,500 WON</div>
+            </div>
+            <div class="product">
+                <img src="product2.png" data-hover="product2_hover.png" alt="상품2">
+                <div class="product-name">CIRCLE MASKING TAPE</div>
+                <div class="product-price">4,000 WON</div>
+            </div>
+            <div class="product">
+                <img src="product3.png" data-hover="product3_hover.png" alt="상품3">
+                <div class="product-name">C MUG CUP</div>
+                <div class="product-price">18,000 WON</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="section fff-bg"> <!-- 공백 박스 -->
+
+<!-- 초이스 세션 -->
+<section class="section D6E883-bg">
+    <h2>BEST ITEM</h2>
+    <div class="product-row">
+        <div class="product">
+            <img src="red_shampoo.png" alt="ShampooBar Red">
+            <div class="product-name">shampooBar</div>
+            <div>샬라샬라샬라랄하르라</div>
+        </div>
+        <div class="product">
+            <img src="blue_shampoo.png" alt="ShampooBar Blue">
+            <div class="product-name">shampooBar</div>
+            <div>샬라샬라샬라랄하르라</div>
+        </div>
+        <div class="product">
+            <img src="yellow_shampoo.png" alt="ShampooBar Yellow">
+            <div class="product-name">shampooBar</div>
+            <div>샬라샬라샬라랄하르라</div>
+        </div>
+    </div>
+</section>
+
+<
+
+<!-- ZERO SHOP Section -->
+<section class="section">
+    <h2>ZERO SHOP</h2>
+    <div class="store">
+        <p>경기도 수원시 팔달구 어쩌고저쩌고...</p>
+        <img src="shop_image.png" alt="Zero Shop">
+    </div>
+</section>
+
+
+
+
+
+    <script>
+         /* 메인 딱 내리자마자 이쁜 거 */
+        const items = document.querySelectorAll('.gallery-item');
+
+        function checkPosition() {
+            const windowBottom = window.innerHeight + window.scrollY;
+            items.forEach(item => {
+                const itemTop = item.offsetTop + 100;
+                if (windowBottom > itemTop) {
+                    item.classList.add('show');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkPosition);
+        window.addEventListener('load', checkPosition);
+
+        /* 아이템 움직이는 스크랩트 */
+        let currentIndex = 0;
+        const row = document.getElementById("productRow");
+        const products = document.querySelectorAll(".product");
+        const productWidth = products[0].offsetWidth + 50; // 상품+gap
+
+        function slide(direction = 1) {
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = products.length - 1;
+            if (currentIndex >= products.length) currentIndex = 0;
+            row.style.transform = `translateX(-${currentIndex * productWidth}px)`;
+        }
+
+        // _000으로 설정 = _초마다 자동 이동
+        setInterval(() => slide(1), 2000);
+
+        // hover 시 이미지 교체
+        document.querySelectorAll(".product img").forEach(img => {
+            const originalSrc = img.src;
+            const hoverSrc = img.getAttribute("data-hover");
+            img.addEventListener("mouseenter", () => { if (hoverSrc) img.src = hoverSrc; });
+            img.addEventListener("mouseleave", () => { img.src = originalSrc; });
+        });
+    </script>
+</body>
+</html>

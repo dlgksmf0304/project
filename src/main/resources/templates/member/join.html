@@ -1,0 +1,184 @@
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <title>Member Join Page</title>
+</head>
+
+<div layout:fragment="content">
+    <div class="row mt-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    JOIN
+                </div>
+                <div class="card-body">
+                    <form id="registerForm" action="/member/join" method="post">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">ID</span>
+                            <input type="text" name="m_id" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">PW</span>
+                            <input type="password" name="m_password" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">NAME</span>
+                            <input type="text" name="m_name" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">EMAIL</span>
+                            <input type="email" name="m_email" class="form-control">
+                            <button type="button" class="btn btn-outline-secondary" onclick="sendEmailCode()">인증번호 발송</button>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">EMAIL CODE</span>
+                            <input type="text" name="emailCode" id="emailCode" class="form-control">
+                            <button type="button" class="btn btn-outline-secondary" onclick="verifyEmailCode()">확인</button>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">PHONENUMBER</span>
+                            <input type="text" name="m_phoneNumber" class="form-control">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">ADDRESS</span>
+                            <input type="text" name="m_address" class="form-control">
+                        </div>
+
+                        <div class="my-4">
+                            <div class="float-end">
+                                <button type="submit" class="btn btn-primary submitBtn">Submit</button>
+                                <button type="reset" class="btn btn-secondary">Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>&lt;!&ndash;end card body&ndash;&gt;
+
+            </div>&lt;!&ndash;end card&ndash;&gt;
+        </div>&lt;!&ndash; end col&ndash;&gt;
+    </div>&lt;!&ndash; end row&ndash;&gt;
+
+
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+
+    //738 추가
+    const error = [[${error}]]
+
+    if(error && error === 'mid'){
+        alert("동일한 아이디를 가진 계정이 존재합니다.")
+    }
+
+
+</script>
+-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<meta charset="UTF-8">
+
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+
+<body>
+<div class="card-body">
+    <div layout:fragment="content">
+
+    <div class="row mt-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    JOIN
+                </div>
+                <br><br><br>
+                <div class="card-body">
+
+
+                    <div class="input-group mb-3">
+                        <span class="form-control">EMAIL</span>
+                        <input type="email" id="memail" class="form-control" required>
+                        <button type="button" id="sendEmailBtn" class="btn-submit">인증번호 발송</button>
+                    </div>
+                    <div id="emailMessage" style="color:green; margin-top:10px;"></div>
+
+                    <div id="verifySection" class="input-group mb-3" style="display:none">
+                        <span class="form-control">EMAIL CODE</span>
+                        <input type="text" id="emailCode" class="form-control" required>
+                        <button type="button" id="verifyBtn" class="btn-submit">확인</button>
+                    </div>
+                   <!--회원가입 폼 (이메일 인증 완료 후)-->
+                    <form id="registerForm" action="/member/join" method="post" style="display:none">
+                        <input type="hidden" name="memail" id="hiddenMemail">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">ID</span>
+                            <input type="text" name="mid" class="form-control" required>
+                        </div>
+                      <!--  <div class="input-group mb-3">
+                            <span class="input-group-text">PW</span>
+                            <input type="password" name="mpassword" class="form-control" required>
+                        </div>-->
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">PW</span>
+                            <input type="password" class="form-control" id="mpassword" name="mpassword" placeholder="비밀번호">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">PWCHECK</span>
+                            <input type="password" class="form-control" id="mpasswordcheck" name="mpasswordcheck" placeholder="비밀번호 확인">
+                        </div>
+                        <div id="pwMessage" style="color:red; font-size:0.9em; margin-bottom:10px;"></div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">NAME</span>
+                            <input type="text" name="mname" class="form-control" required>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">PHONENUMBER</span>
+                            <input type="text" name="mphoneNumber" class="form-control">
+                        </div>
+
+                        <input type="text" id="mpostcode" name="mpostcode" placeholder="우편번호" readonly>
+                        <input type="text" id="maddress" name="maddress" placeholder="주소" readonly>
+                        <input type="text" id="mdetailAddress" name="mdetailAddress" placeholder="상세주소">
+                        <button type="button" id="addrBtn" class="btn-submit">주소 검색</button>
+
+                        <div class="my-4">
+                            <div class="float-end">
+                                <button type="submit" class="btn-submit">Submit</button>
+                                <button type="reset" class="btn-submit">Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <th:block layout:fragment="script">
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="/js/addAddressDetails.js"></script>
+        <script src="/js/passwordCheck.js"></script>
+        <script src="/js/mailCheck.js"></script>
+    </th:block>
+
+</body>
+</html>

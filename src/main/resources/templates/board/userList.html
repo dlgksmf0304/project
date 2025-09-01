@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+        <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<div layout:fragment="content">
+    <div class="row mt-3">
+
+        <div class="col">
+
+            <div class="card">
+                <div class="card-header">
+                    문의사항
+                </div>
+                <div class="card-body" >
+                    <h5 class="card-title">게시판</h5>
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">번호</th>
+                            <th scope="col">제목</th>
+                            <th scope="col">작성자</th>
+                            <th scope="col">작성일</th>
+                            <th scope="col">조회 수</th>
+                        </tr>
+                        </thead>
+
+                        <tbody th:with="link=${pageRequestDTO.getLink()}">
+                        <tr class="table-body" th:each="dto : ${responseDTO1.dtoList}">
+                            <th scope="row">[[${dto.bno}]]</th>
+                            <td>
+                                <a th:href="|@{/board/userRead(bno=${dto.bno})}&${link}|"
+                                   style="text-decoration: none; color: inherit;">
+                                    <span th:if="${dto.category != null}" style="color:#009879; font-weight:bold">
+                                        [[${'[' + dto.category + ']'}]] </span>
+                                    [[${dto.title}]]
+                                </a>
+                                <span class="badge progress-bar-success" style="background-color:#009879">
+                                    [[${dto.replyCount}]]
+                                </span>
+                            </td>
+                            <td>[[${dto.writer}]]</td>
+                            <td>[[${#temporals.format(dto.regDate, 'yyyy-MM-dd')}]]</td>
+                            <td th:text="${dto.viewCount}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <form action="/board/userList" method="get">
+                        <div class="col">
+
+                            <input type="hidden" name="size" th:value="${pageRequestDTO.size}">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <select class="form-select" name="type">
+                                        <option value="">----</option>
+                                        <option value="t" th:selected="${pageRequestDTO.type=='t'}">제목</option>
+                                        <option value="c" th:selected="${pageRequestDTO.type=='c'}">내용</option>
+                                        <option value="w" th:selected="${pageRequestDTO.type=='w'}">작성자</option>
+
+                                    </select>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input type="text" class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}">
+
+                                    <button class="btn-submit" type="submit">search</button>
+                                    <button class="btn-submit" type="button">clear</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="float-end">
+                        <ul class="pagination flex-wrap">
+
+                            <li class="page-item" th:classappend="${!responseDTO1.prev} ? 'disabled'">
+                                <a href="javascript:void(0)" class="page-link"
+                                   th:onclick="'movePage(' + ${responseDTO1.page - 1} + ')'">이전</a>
+                            </li>
+
+                            <th:block th:each="i : ${#numbers.sequence(responseDTO1.start, responseDTO1.end)}">
+<!--                                <li th:class="${responseDTO1.page == i} ? 'page-item active' : 'page-item'">-->
+                                    <a href="javascript:void(0)" class="page-link"
+                                       th:data-num="${i}" th:text="${i}"></a>
+                               <!-- </li>-->
+                            </th:block>
+
+                            <!-- 다음 버튼 -->
+                            <li class="page-item" th:classappend="${!responseDTO1.next} ? 'disabled'">
+                                <a href="javascript:void(0)" class="page-link"
+                                   th:onclick="'movePage(' + ${responseDTO1.page + 1} + ')'">다음</a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <a href="/board/userRegister">
+                        <button type="button" class="btn-write">글쓰기</button>
+                        <br><br><br><br>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+<br>
+
+
+
+<script layout:fragment="script" th:inline="javascript">
+    console.log("스크립트 로딩...");
+
+    // 페이지 이동 함수
+    function movePage(pageNum) {
+        console.log("페이지 이동:", pageNum);
+
+        // 현재 URL 파라미터 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // page 파라미터 설정
+        urlParams.set('page', pageNum);
+
+        // 페이지 이동
+        window.location.href = window.location.pathname + '?' + urlParams.toString();
+    }
+
+    // 페이지 번호 클릭 이벤트 (추가 안전장치)
+    document.addEventListener('DOMContentLoaded', function() {
+        const pageLinks = document.querySelectorAll('.page-link[data-num]');
+        pageLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageNum = this.getAttribute('data-num');
+                if (pageNum) {
+                    movePage(pageNum);
+                }
+            });
+        });
+    });
+</script>
+
+
+</div>
+</div>
+</html>

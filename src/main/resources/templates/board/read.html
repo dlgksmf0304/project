@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+<div class="board-container">
+  <div class="board-header">게시판</div>
+
+
+
+
+
+  <div class="board-item">
+    <div class="board-label">번호</div>
+    <div class="board-value" th:text="${dto.bno}"></div>
+  </div>
+
+  <div class="board-item">
+    <div class="board-label">제목</div>
+    <div class="board-value" th:text="${dto.title}"></div>
+  </div>
+
+  <div class="board-item board-content">
+    <div class="board-label">내용</div>
+    <div class="board-value" th:text="${dto.content}"></div>
+    <p th:if="${dto.fileNames == null || #lists.isEmpty(dto.fileNames)}">이미지가 없습니다.</p>
+
+  </div>
+
+  <div th:if="${dto.fileNames != null}">
+    <img th:each="url : ${dto.fileNames}"
+         th:src="@{${url}}"
+         style="width:150px; margin-right:10px;" />
+  </div>
+
+
+
+  <div class="board-item">
+    <div class="board-label">작성자</div>
+    <div class="board-value" th:text="${dto.writer}"></div>
+  </div>
+
+  <div class="board-item">
+    <div class="board-label">작성일</div>
+    <div class="board-value" th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+  </div>
+
+  <div class="board-item">
+    <div class="board-label">수정일</div>
+    <div class="board-value" th:text="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+  </div>
+
+  <div class="board-item board-content">
+    <div class="board-label">조회 수</div>
+    <div class="board-value" th:text="${dto.viewCount}"></div>
+</div>
+
+  <div class="board-item">
+    <div class="board-label">대표 이미지</div>
+    <div class="board-value" th:if="${image != null}">
+      <img th:src="${image.uploadPath + '/' + image.storedFileName}" alt="대표 이미지">
+    </div>
+  </div>
+
+
+
+  <div class="button-group">
+    <!-- 하트 버튼 -->
+    <button onclick="toggleLike(this)" th:data-bno="${dto.bno}" class="like-button">
+      <span class="heart-icon" th:text="${dto.likeCount > 0 ? '♥' : '♡'}">♡</span>
+      <span class="like-count" th:text="${dto.likeCount}">0</span>
+    </button>
+
+    <button type="button" class="btn btn-list listBtn"
+            onclick="location.href='/board/list'">목록</button>
+
+    <a th:href="@{/board/modify(bno=${dto.bno})}">
+      <button type="button" class="btn btn-modify">수정하기</button>
+    </a>
+
+
+    <form th:action="@{/board/remove}" method="post" style="display:inline;">
+      <input type="hidden" th:name="bno" th:value="${dto.bno}" />
+      <button type="submit" class="btn btn-remove">삭제하기</button>
+    </form>
+
+    </div>
+  </div>
+</div>
+
+
+
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    function toggleLike(button) {
+      const bno = button.getAttribute('data-bno');
+      const heartIcon = button.querySelector('.heart-icon');
+      const countSpan = button.querySelector('.like-count');
+
+      fetch('/board/like/' + bno, { method: 'POST' })
+              .then(res => res.json())
+              .then(data => {
+                if(data.success) {
+                  countSpan.textContent = data.likeCount;
+                  heartIcon.textContent = data.liked ? '♥' : '♡';
+                }
+              })
+              .catch(err => console.error(err));
+    }
+  </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+        <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+<div class="board-container">
+    <div class="board-header">게시판</div>
+
+    <form th:action="@{/board/userRegister}" method="post" th:object="${dto}">
+        <div class="board-item">
+            <div class="board-label">제목</div>
+            <div class="board-value">
+                <input type="text" th:field="*{title}" class="clean-input" placeholder="제목을 세 글자 이상 입력하세요" />
+            </div>
+        </div>
+
+        <!-- <div th:if="${#authentication.principal?.role == 'ADMIN'}">-->
+        <label><input type="radio" th:field="*{category}" value="상품문의">[상품문의]</label>
+        <label><input type="radio" th:field="*{category}" value="교환반품문의">[교환/반품문의]</label>
+        <label><input type="radio" th:field="*{category}" value="배송문의">[배송문의]</label>
+
+
+        <div class="board-item">
+            <div class="board-label">내용</div>
+            <div class="board-value board-content">
+                <textarea th:field="*{content}" class="clean-input" rows="5" placeholder="내용을 입력하세요"></textarea>
+            </div>
+        </div>
+
+        <!-- <div class="board-item" th:if="${user.role eq 'ADMIN'}">-->
+        <div class="board-item">
+            <div class="board-label">작성자</div>
+            <div class="board-value">
+                <input type="text" th:field="*{writer}" class="clean-input" placeholder="작성자를 입력하세요" />
+            </div>
+        </div>
+
+        <div class="float-end">
+            <button type="submit" class="btn btn-submit">작성하기</button>
+        </div>
+    </form>
+
+
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+</body>
+</html>

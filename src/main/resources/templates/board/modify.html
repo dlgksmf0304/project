@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+<div class="board-container">
+  <div class="board-header">수정하기</div>
+
+  <form th:action="@{/board/modify}" method="post" th:object="${dto}">
+    <div class="board-item">
+      <div class="board-label">번호</div>
+      <div class="board-value readonly">
+        <input type="text" th:field="*{bno}" class="clean-input" readonly>
+      </div>
+    </div>
+
+    <div class="board-item">
+      <div class="board-label">제목</div>
+      <div class="board-value">
+        <input type="text" th:field="*{title}" class="clean-input">
+      </div>
+    </div>
+
+    <div class="board-item">
+      <div class="board-label">내용</div>
+      <div class="board-value board-content">
+        <textarea rows="5" th:field="*{content}" class="clean-input"></textarea>
+      </div>
+    </div>
+
+    <div class="board-item">
+      <div class="board-label">작성자</div>
+      <div class="board-value readonly">
+        <input type="text" th:field="*{writer}" class="clean-input" readonly>
+      </div>
+    </div>
+
+    <div class="button-group ">
+      <button type="submit" class="btn btn-submit">수정하기</button>
+
+
+      <button type="button" class="btn btn-submit"
+              onclick="location.href='/board/list'">목록</button>
+    </div>
+  </form>
+</div>
+</div>
+</body>
+</html>
